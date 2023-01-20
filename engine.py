@@ -1,12 +1,13 @@
 import ssl
 import json
+import time
 import pandas as pd
 from datetime import datetime
 import requests
-import asyncio
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from requests.auth import HTTPBasicAuth
 from sqlalchemy import text
+from sqlalchemy.orm import Session
 from config import (
     SENAITE_BASE_URL,
     SENAITE_USER,
@@ -15,7 +16,7 @@ from config import (
     SLEEP_SECONDS,
     SLEEP_SUBMISSION_COUNT
 )
-from db import async_session_factory, test_db_connection
+from db import engine, test_db_connection
 from logger import Logger
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
@@ -32,24 +33,24 @@ class Hl7OrderHandler:
                 incoming[index] = item.replace(';', ' ').strip()
         return incoming
 
-    async def fetch_hl7_results(self):
+    def fetch_hl7_results(self):
         logger.log("info", f"Hl7OrderHandler: Fetching hl7 result orders ...")
         select_stmt = text("""select * from orders where lims_sync_status=0""")
 
-        async with async_session_factory() as session:
-            result = await session.execute(select_stmt)
+        with Session(engine) as session:
+            result = session.execute(select_stmt)
 
-        return await self.hl7_result_to_dataframe(result.all(), result.keys())
+        return self.hl7_result_to_dataframe(result.all(), result.keys())
 
-    async def hl7_result_to_dataframe(self, results, keys):
+    def hl7_result_to_dataframe(self, results, keys):
         return pd.DataFrame([self.sanitise(line) for line in results], columns=keys)
 
     @staticmethod
-    async def hl7_result_to_csv(data_frame):
+    def hl7_result_to_csv(data_frame):
         data_frame.to_csv("hl7_results.csv", index=False)
 
     @staticmethod
-    async def update_hl7_result(order_id: int, lims_sync_status: int):
+    def update_hl7_result(order_id: int, lims_sync_status: int):
         logger.log(
             "info", f"Hl7OrderHandler: Updating hl7 result order with uid: {order_id} with lims_sync_status: {lims_sync_status} ...")
         update_stmt = text(
@@ -61,9 +62,9 @@ class Hl7OrderHandler:
             "date_updated": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }
 
-        async with async_session_factory() as session:
-            await session.execute(update_stmt, update_line)
-            await session.commit()
+        with Session(engine) as session:
+            session.execute(update_stmt, update_line)
+            session.commit()
 
 
 class SenaiteHandler:
@@ -192,21 +193,21 @@ class SenaiteHandler:
 
 
 class ResultInterface(Hl7OrderHandler, SenaiteHandler):
-    async def run(self):
-        database_reachable = await test_db_connection()
+    def run(self):
+        database_reachable = test_db_connection()
         if not self.test_senaite_connection() or not database_reachable:
             return
 
-        orders = await self.fetch_hl7_results()
+        orders = self.fetch_hl7_results()
         for index, order in orders.iterrows():
 
             if index > 0 and index % SLEEP_SUBMISSION_COUNT == 0:
                 logger.log("info", f"ResultInterface:  ---sleeping---")
-                await asyncio.sleep(SLEEP_SECONDS)
+                time.sleep(SLEEP_SECONDS)
                 logger.log("info", f"ResultInterface:  ---waking---")
 
             senaite_updated = self.do_work_for_order(
                 order["order_id"], order["results"], order["test_type"]
             )
             if senaite_updated:
-                await self.update_hl7_result(order["id"], 1)
+                self.update_hl7_result(order["id"], 1)

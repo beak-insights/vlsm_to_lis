@@ -1,4 +1,3 @@
-import asyncio
 import time
 import os
 import sys
@@ -20,7 +19,7 @@ def is_windows():
 
 
 def commence_raw():
-    asyncio.run(ResultInterface().run())
+    ResultInterface().run()
 
 
 def commence_scheuled():
