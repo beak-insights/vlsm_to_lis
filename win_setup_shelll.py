@@ -19,10 +19,9 @@ def init():
     # create another file to run the startup script in bg
     with open(silencer_file, "w+") as silencer:
         the_shell = f"""
-        Set onShell = CreateObject("WScript.Shell")
-        Dim strArgs
-        strArgs = "cmd /c {sartup_file}"
-        onShell.Run strArgs, 0, false
+        Set WshShell = CreateObject("WScript.Shell")
+        WshShell.Run Chr(34) & "{sartup_file}" & Chr(34), 0
+        Set WshShell = Nothing
         """
         silencer.write(the_shell)
 
@@ -35,9 +34,3 @@ if __name__ == '__main__':
         init()
     else:
         print("This setup file is meant for Windows os only!")
-
-
-# cmd /c foo.cmd
-# start /b /w go.bat
-# start cmd /c "some command && exit 0"
-# start /min cmd ...
