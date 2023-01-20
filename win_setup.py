@@ -40,11 +40,3 @@ if __name__ == '__main__':
 # start /b /w go.bat
 # start cmd /c "some command && exit 0"
 # start /min cmd ...
-
-
-xxx = """
-Set onShell = CreateObject ("Wscript.Shell")
-Dim strArgs
-strArgs = "cmd /c {}
-onShell.Run strArgs, 0, false
-"""

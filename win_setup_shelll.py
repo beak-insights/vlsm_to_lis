@@ -34,3 +34,11 @@ if __name__ == '__main__':
         init()
     else:
         print("This setup file is meant for Windows os only!")
+
+# ddnt work
+# xxx = """
+# Set onShell = CreateObject ("Wscript.Shell")
+# Dim strArgs
+# strArgs = "cmd /c {}
+# onShell.Run strArgs, 0, false
+# """
