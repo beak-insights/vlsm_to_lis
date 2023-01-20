@@ -8,7 +8,7 @@ sartup_path = os.path.join(
     user_path, 'AppData', 'Roaming', 'Microsoft', 'Windows', 'Start Menu', 'Programs', 'Startup')
 
 sartup_file = os.path.join(BASE_DIR, "run_interface.cmd")
-silencer_file = os.path.join(sartup_path, "hl7_silencer.cmd")
+silencer_file = os.path.join(sartup_path, "hl7_silencer.vbs")
 
 
 def init():
