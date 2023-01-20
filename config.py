@@ -11,4 +11,6 @@ SENAITE_HOST = "192.168.0.55:80"
 SENAITE_BASE_URL = f"http://{SENAITE_HOST}/senaite/@@API/senaite/v1/"
 SENAITE_USER = "system_daemon"
 SENAITE_PASSWORD = "s89Ajs-UIas!3k"
-VERIFY_RESULT = True
+VERIFY_RESULT = False
+
+SLEEP_SECONDS = 5

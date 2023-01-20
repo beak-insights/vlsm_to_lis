@@ -3,10 +3,17 @@ import json
 import pandas as pd
 from datetime import datetime
 import requests
+import asyncio
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from requests.auth import HTTPBasicAuth
 from sqlalchemy import text
-from config import SENAITE_BASE_URL, SENAITE_USER, SENAITE_PASSWORD, VERIFY_RESULT
+from config import (
+    SENAITE_BASE_URL,
+    SENAITE_USER,
+    SENAITE_PASSWORD,
+    VERIFY_RESULT,
+    SLEEP_SECONDS
+)
 from db import async_session_factory, test_db_connection
 from logger import Logger
 
@@ -190,7 +197,13 @@ class ResultInterface(Hl7OrderHandler, SenaiteHandler):
             return
 
         orders = await self.fetch_hl7_results()
-        for _, order in orders.iterrows():
+        for index, order in orders.iterrows():
+
+            if index > 0 and index % 10 == 0:
+                logger.log("info", f"ResultInterface:  ---sleeping---")
+                await asyncio.sleep(SLEEP_SECONDS)
+                logger.log("info", f"ResultInterface:  ---waking---")
+
             senaite_updated = self.do_work_for_order(
                 order["order_id"], order["results"], order["test_type"]
             )
