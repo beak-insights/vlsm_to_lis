@@ -4,7 +4,7 @@ import sys
 from datetime import datetime
 from engine import ResultInterface
 from logger import setup_logs_dirs, Logger
-from config import LINUX_USING_CRON_TIME_SCHEDULER
+from config import LINUX_USING_CRON_TIME_SCHEDULER, POLL_HL7BD_EVERY
 
 setup_logs_dirs()
 logger = Logger(__name__, __file__)
@@ -27,7 +27,7 @@ def commence_scheuled():
 
     # run now and schedule the nest jobs
     commence_raw()
-    schedule.every(10).minutes.do(commence_raw)
+    schedule.every(POLL_HL7BD_EVERY).minutes.do(commence_raw)
 
     while True:
         schedule.run_pending()
