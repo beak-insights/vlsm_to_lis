@@ -1,7 +1,6 @@
 import os
 import sys
 import distutils.dir_util
-from pathlib import Path
 
 
 def is_linux():

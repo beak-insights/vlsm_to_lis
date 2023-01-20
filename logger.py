@@ -7,11 +7,12 @@ from logging.handlers import RotatingFileHandler
 from pathlib import Path
 from helpers import log_file_setup
 
-user_path = str(os.path.expanduser('~'))
-log_file_path = Path(os.path.join(
-    user_path, 'Documents', 'HL7DB-to-senaite', 'logs'))
-log_file = Path(os.path.join(user_path, 'Documents',
-                             'HL7DB-to-senaite', 'logs', 'messages.log'))
+user_path = os.path.expanduser('~')
+log_file_path = os.path.join(
+    user_path, 'Documents', 'HL7DB-to-senaite', 'logs')
+log_file = os.path.join(log_file_path, 'messages.log')
+log_file_path = Path(log_file_path)
+log_file = Path(log_file)
 
 
 class Logger():
