@@ -18,12 +18,13 @@ def init():
 
     # create another file to run the startup script in bg
     with open(silencer_file, "w+") as silencer:
-        file_data = f"""
-        @echo off
-        start {sartup_file}
-        exit
+        the_shell = """
+        Set onShell = CreateObject ("Wscript.Shell")
+        Dim strArgs
+        strArgs = "cmd /c {sartup_file}
+        onShell.Run strArgs, 0, false
         """
-        silencer.write(file_data)
+        silencer.write(the_shell)
 
     # reboot windows machine
     os.system("shutdown /r /t 1")  # os.system("shutdown -t 0 -r -f")
@@ -40,11 +41,3 @@ if __name__ == '__main__':
 # start /b /w go.bat
 # start cmd /c "some command && exit 0"
 # start /min cmd ...
-
-
-xxx = """
-Set onShell = CreateObject ("Wscript.Shell")
-Dim strArgs
-strArgs = "cmd /c {}
-onShell.Run strArgs, 0, false
-"""
