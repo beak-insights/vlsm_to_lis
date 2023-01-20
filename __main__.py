@@ -1,21 +1,11 @@
 import time
-import os
-import sys
 from datetime import datetime
 from engine import ResultInterface
-from logger import setup_logs_dirs, Logger
+from logger import Logger
 from config import LINUX_USING_CRON_TIME_SCHEDULER, POLL_HL7BD_EVERY
+from helpers import is_linux
 
-setup_logs_dirs()
 logger = Logger(__name__, __file__)
-
-
-def is_linux():
-    return sys.platform == 'linux' or sys.platform.startswith('linux') or os.name == 'posix'
-
-
-def is_windows():
-    return sys.platform == 'win32' or sys.platform.startswith('win') or os.name == 'nt'
 
 
 def commence_raw():

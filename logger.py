@@ -1,25 +1,30 @@
-import logging
-import os
-from logging.handlers import RotatingFileHandler
-import os
+
 import sys
+import os
+import logging
+from logging.handlers import RotatingFileHandler
 
-from config import BASE_DIR
+from pathlib import Path
+from helpers import is_linux, log_file_setup
 
+log_file_path = Path(str(os.path.expanduser('~')) +
+                     '\\Documents\\HL7DB-to-senaite\\logs\\')
+log_file = Path(str(os.path.expanduser('~')) +
+                '\\Documents\\HL7DB-to-senaite\\logs\\messages.log')
 
-def setup_logs_dirs():
-    if not os.path.exists(os.path.join(BASE_DIR, 'logs')):
-        os.makedirs(os.path.join(BASE_DIR, 'logs'))
-        with open(os.path.join(BASE_DIR, 'logs', "messages.log"), "w") as f:
-            f.write("")
-        f.close()
+if is_linux():
+    log_file_path = Path(str(os.path.expanduser('~')) +
+                         '/Documents/HL7DB-to-senaite/logs/')
+    log_file = Path(str(os.path.expanduser('~')) +
+                    '/Documents/HL7DB-to-senaite/logs/messages.log')
 
 
 class Logger():
-    file_all = os.path.join(BASE_DIR, 'logs', 'messages.log')
+    file_all = log_file
     logging = logging
 
     def __init__(self, module_name, file_path):
+        log_file_setup(log_file_path, log_file)
         self.logging.getLogger(module_name)
         self.logging.basicConfig(
             handlers=[
