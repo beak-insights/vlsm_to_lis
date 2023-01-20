@@ -5,18 +5,13 @@ import logging
 from logging.handlers import RotatingFileHandler
 
 from pathlib import Path
-from helpers import is_linux, log_file_setup
+from helpers import log_file_setup
 
-log_file_path = Path(str(os.path.expanduser('~')) +
-                     '\\Documents\\HL7DB-to-senaite\\logs\\')
-log_file = Path(str(os.path.expanduser('~')) +
-                '\\Documents\\HL7DB-to-senaite\\logs\\messages.log')
-
-if is_linux():
-    log_file_path = Path(str(os.path.expanduser('~')) +
-                         '/Documents/HL7DB-to-senaite/logs/')
-    log_file = Path(str(os.path.expanduser('~')) +
-                    '/Documents/HL7DB-to-senaite/logs/messages.log')
+user_path = str(os.path.expanduser('~'))
+log_file_path = Path(os.path.join(
+    user_path, 'Documents', 'HL7DB-to-senaite', 'logs'))
+log_file = Path(os.path.join(user_path, 'Documents',
+                             'HL7DB-to-senaite', 'logs', 'messages.log'))
 
 
 class Logger():
