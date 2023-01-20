@@ -12,7 +12,8 @@ from config import (
     SENAITE_USER,
     SENAITE_PASSWORD,
     VERIFY_RESULT,
-    SLEEP_SECONDS
+    SLEEP_SECONDS,
+    SLEEP_SUBMISSION_COUNT
 )
 from db import async_session_factory, test_db_connection
 from logger import Logger
@@ -199,7 +200,7 @@ class ResultInterface(Hl7OrderHandler, SenaiteHandler):
         orders = await self.fetch_hl7_results()
         for index, order in orders.iterrows():
 
-            if index > 0 and index % 10 == 0:
+            if index > 0 and index % SLEEP_SUBMISSION_COUNT == 0:
                 logger.log("info", f"ResultInterface:  ---sleeping---")
                 await asyncio.sleep(SLEEP_SECONDS)
                 logger.log("info", f"ResultInterface:  ---waking---")
