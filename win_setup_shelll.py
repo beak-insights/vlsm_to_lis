@@ -26,7 +26,7 @@ def init():
         silencer.write(the_shell)
 
     # reboot windows machine
-    os.system("shutdown /r /t 1")  # os.system("shutdown -t 0 -r -f")
+    # os.system("shutdown /r /t 1")  # os.system("shutdown -t 0 -r -f")
 
 
 if __name__ == '__main__':
