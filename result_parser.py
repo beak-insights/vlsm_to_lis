@@ -33,12 +33,6 @@ class IntResultHandler:
         val = int(val.split('*')[1])
         return val > 0, eval('1' + '0'*val)
 
-    def round(self, val):
-        """For results with >= .5 round up else round down"""
-        if int(str(val).split(".")[1]) >= 5:
-            return math.ceil(val)
-        return math.floor(val)
-
     def try_cast(self, val):
         """Thorough check if current result is strictly text or numeric"""
         try:
@@ -70,4 +64,4 @@ class ResultParser(IntResultHandler, StringResultParser):
         val = self.to_float(self.result)
         is_positive, multiplier = self.multiplier
         val = val*multiplier if is_positive else val
-        return self.round(val)
+        return round(val)

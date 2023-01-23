@@ -7,7 +7,7 @@ DB_USER = "interface"
 DB_PASSWORD = "Nmrl123456$"
 DB_HOST = "192.168.1.8:3306"
 
-SENAITE_HOST = "192.168.0.32:80"
+SENAITE_HOST = "192.168.0.55:80"
 SENAITE_BASE_URL = f"http://{SENAITE_HOST}/senaite/@@API/senaite/v1/"
 SENAITE_USER = "system_daemon"
 SENAITE_PASSWORD = "s89Ajs-UIas!3k"
