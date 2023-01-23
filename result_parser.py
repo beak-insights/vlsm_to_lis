@@ -25,13 +25,20 @@ class IntResultHandler:
         return float(val[0] + "." + val[1:])
 
     @property
-    def multiplier(self):
-        """derive padding from 'xxx*exp.unit'"""
+    def quotient(self):
+        """derive padding from 'xxx*quotient.unit'"""
         # get 'xxx*exp'
         val = self.test_unit.split('.')[0]
         # get 'exp'
-        val = int(val.split('*')[1])
-        return val > 0, eval('1' + '0'*val)
+        return int(val.split('*')[1])
+
+    def multiplier(self, multiple):
+        """derive padding from 'xxx*exp.unit'"""
+        return eval('1' + '0'*abs(multiple))
+
+    def round(self, val):
+        """For results with >= .5 round up else round down"""
+        return round(val)
 
     def try_cast(self, val):
         """Thorough check if current result is strictly text or numeric"""
@@ -61,7 +68,12 @@ class ResultParser(IntResultHandler, StringResultParser):
         if not self.test_unit:
             return val
 
-        val = self.to_float(self.result)
-        is_positive, multiplier = self.multiplier
-        val = val*multiplier if is_positive else val
-        return round(val)
+        if self.quotient == 0:
+            return val
+
+        multiplier = self.multiplier(self.quotient)
+        if self.quotient > 0:
+            return val*multiplier
+
+        # self.quotient < 0
+        return self.round(val/multiplier)
