@@ -17,6 +17,7 @@ from config import (
     SLEEP_SUBMISSION_COUNT
 )
 from db import engine, test_db_connection
+from result_parser import ResultParser
 from logger import Logger
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
@@ -206,8 +207,14 @@ class ResultInterface(Hl7OrderHandler, SenaiteHandler):
                 time.sleep(SLEEP_SECONDS)
                 logger.log("info", f"ResultInterface:  ---waking---")
 
+            # Parse the result object before sending to LIMS
+            result_parser = ResultParser(order["results"], order["test_unit"])
+            result = result_parser.output
+
             senaite_updated = self.do_work_for_order(
-                order["order_id"], order["results"], order["test_type"]
+                order["order_id"],
+                result,
+                order["test_type"]
             )
             if senaite_updated:
                 self.update_hl7_result(order["id"], 1)

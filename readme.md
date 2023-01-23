@@ -1,7 +1,15 @@
 # Hl7DB to Senaite
 
-### create a mysql user if not exist 
-`create user 'username'@'%' identified with mysql_native_password by '<password>';`
+### create a mysql/mariadb user if not exist 
+create databse `create database db_name;`
+
+create user in mysql: `create user 'username'@'%' identified with mysql_native_password by '<password>';` and then 
+`GRANT ALL PRIVILEGES ON db_name.* TO 'username'@'%';`
+
+create user in mariadb `grant all privileges on databse_name.* TO 'username'@'%' identified by '<password>';` 
+
+finally `fush privileges`
+
 
 make sure you have installed `python 3.9.5 or higher`
 
