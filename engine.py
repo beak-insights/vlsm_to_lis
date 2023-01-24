@@ -38,7 +38,7 @@ class Hl7OrderHandler:
     def fetch_hl7_results(self):
         logger.log("info", f"Hl7OrderHandler: Fetching hl7 result orders ...")
         select_stmt = text(
-            """select * from orders where length(raw_text) < 1200""")
+            """select * from orders where lims_sync_status=0 and length(raw_text) < 1200 and results not in ("Invalid", "ValueNotSet")""")
 
         with Session(engine) as session:
             result = session.execute(select_stmt)
