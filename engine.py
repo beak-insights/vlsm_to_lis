@@ -14,7 +14,8 @@ from config import (
     SENAITE_PASSWORD,
     VERIFY_RESULT,
     SLEEP_SECONDS,
-    SLEEP_SUBMISSION_COUNT
+    SLEEP_SUBMISSION_COUNT,
+    EXCLUDE_RESULTS
 )
 from db import engine, test_db_connection
 from result_parser import ResultParser
@@ -198,7 +199,7 @@ class ResultInterface(Hl7OrderHandler, SenaiteHandler):
         database_reachable = test_db_connection()
         if not self.test_senaite_connection() or not database_reachable:
             return
-
+        to_exclude = [x.strip().lower() for x in EXCLUDE_RESULTS]
         orders = self.fetch_hl7_results()
         for index, order in orders.iterrows():
 
@@ -211,10 +212,15 @@ class ResultInterface(Hl7OrderHandler, SenaiteHandler):
             result_parser = ResultParser(order["results"], order["test_unit"])
             result = result_parser.output
 
-            senaite_updated = self.do_work_for_order(
-                order["order_id"],
-                result,
-                order["test_type"]
-            )
+            if result.strip().lower() not in to_exclude:
+                senaite_updated = self.do_work_for_order(
+                    order["order_id"],
+                    result,
+                    order["test_type"]
+                )
+            else:
+                # also update hl7 db for excluded to avoid unecessary trips
+                senaite_updated = True
+
             if senaite_updated:
                 self.update_hl7_result(order["id"], 1)
