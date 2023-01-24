@@ -37,7 +37,8 @@ class Hl7OrderHandler:
 
     def fetch_hl7_results(self):
         logger.log("info", f"Hl7OrderHandler: Fetching hl7 result orders ...")
-        select_stmt = text("""select * from orders where lims_sync_status=0""")
+        select_stmt = text(
+            """select * from orders where length(raw_text) < 1200""")
 
         with Session(engine) as session:
             result = session.execute(select_stmt)
@@ -45,7 +46,11 @@ class Hl7OrderHandler:
         return self.hl7_result_to_dataframe(result.all(), result.keys())
 
     def hl7_result_to_dataframe(self, results, keys):
-        return pd.DataFrame([self.sanitise(line) for line in results], columns=keys)
+        # Aso skip those whose raw_data payload len is > 1200
+        df = pd.DataFrame([self.sanitise(line)
+                          for line in results], columns=keys)
+        df = df[df['raw_text'].map(lambda x: len(str(x)) < 1200)]
+        return df
 
     @staticmethod
     def hl7_result_to_csv(data_frame):
@@ -210,17 +215,24 @@ class ResultInterface(Hl7OrderHandler, SenaiteHandler):
 
             # Parse the result object before sending to LIMS
             result_parser = ResultParser(order["results"], order["test_unit"])
-            result = result_parser.output
+            result = str(result_parser.output)
 
-            if result.strip().lower() not in to_exclude:
+            if isinstance(result, str):
+                if result.strip().lower() in to_exclude:
+                    # also update hl7 db for excluded to avoid unecessary trips
+                    senaite_updated = True
+                else:
+                    senaite_updated = self.do_work_for_order(
+                        order["order_id"],
+                        result,
+                        order["test_type"]
+                    )
+            else:
                 senaite_updated = self.do_work_for_order(
                     order["order_id"],
                     result,
                     order["test_type"]
                 )
-            else:
-                # also update hl7 db for excluded to avoid unecessary trips
-                senaite_updated = True
 
             if senaite_updated:
                 self.update_hl7_result(order["id"], 1)
