@@ -1,0 +1,1 @@
+# script must be cloned directly in /home/administrator/Documents/interface/hl7db_to_seinaite/ for supervisor to work well
