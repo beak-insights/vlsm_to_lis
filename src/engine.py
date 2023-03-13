@@ -147,12 +147,23 @@ class SenaiteHandler:
             self.error_handler("create", url, response)
             return False, None
 
-    def do_work_for_order(self, request_id, result, keyword=None):
+    def do_work_for_order(self, order_id, request_id, result, keyword=None):
         self._auth_session()
 
         searched, search_payload = self.search_analyses_by_request_id(
-            request_id)
+            request_id
+        )
         # 'getResult': '', 'getResultCaptureDate': None, 'getSubmittedBy': None, 'getKeyword': 'XXXXXXX'
+
+        if not searched:
+            return False
+
+        search_items = search_payload.get("items", [])
+        if len(search_items) == 0:
+            logger.log(
+                "info", f"SenaiteHandler:  search for {request_id} returned no matches.")
+            Hl7OrderHandler().update_hl7_result(order_id, 5)
+            return False
 
         submitted = False
         submit_payload = {
@@ -160,13 +171,6 @@ class SenaiteHandler:
             "Result": result,
             "InterimFields": []
         }
-
-        if not searched:
-            return False
-
-        search_items = search_payload.get("items")
-        if not len(search_items) > 0:
-            return False
 
         search_data = search_items[0]
         assert search_data.get("getParentTitle") == request_id
@@ -224,12 +228,14 @@ class ResultInterface(Hl7OrderHandler, SenaiteHandler):
                     senaite_updated = True
                 else:
                     senaite_updated = self.do_work_for_order(
+                        order["id"],
                         order["order_id"],
                         result,
                         order["test_type"]
                     )
             else:
                 senaite_updated = self.do_work_for_order(
+                    order["id"],
                     order["order_id"],
                     result,
                     order["test_type"]
