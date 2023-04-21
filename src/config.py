@@ -33,6 +33,8 @@ KEYWORDS_MAPPING = {
     "HI2DIL48": ["HI2CAP96", "VLDBS", "VLPLASMA", ],
     "HI2CAP48": ["HI2CAP96", "VLDBS", "VLPLASMA", ],
     "HI2CAP96": ["HI2CAP96", "VLDBS", "VLPLASMA", ],
+    # Roche 6800/8800
+    "HIVVL": ["VLPLASMA", ],
     # Hologic Panther
     "qHIV-1": ["ViralLoad", "VLDBS", "VLPLASMA", ],
     "HIV-1": ["ViralLoad", "VLDBS", "VLPLASMA", ],
