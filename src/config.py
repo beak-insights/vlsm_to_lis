@@ -20,3 +20,20 @@ POLL_HL7BD_EVERY = 10
 LINUX_USING_CRON_TIME_SCHEDULER = False
 
 EXCLUDE_RESULTS = ["Invalid", "ValueNotSet"]
+
+# Keyword mappings
+KEYWORDS_MAPPING = {
+    # Abbott
+    "HIV1mlDBS": ["Abbott", "HIV06ml", "VLDBS", "VLPLASMA", ],
+    "HIV1.0mlDBS": ["Abbott", "HIV06ml", "VLDBS", "VLPLASMA", ],
+    "HIV06ml": ["Abbott", "HIV06ml", "VLDBS", "VLPLASMA", ],
+    "HIV0.2ml": ["Abbott", "HIV06ml", "VLDBS", "VLPLASMA", ],
+    # Roche Cobas
+    "HI2DIL96": ["HI2CAP96", "VLDBS", "VLPLASMA", ],
+    "HI2DIL48": ["HI2CAP96", "VLDBS", "VLPLASMA", ],
+    "HI2CAP48": ["HI2CAP96", "VLDBS", "VLPLASMA", ],
+    "HI2CAP96": ["HI2CAP96", "VLDBS", "VLPLASMA", ],
+    # Hologic Panther
+    "qHIV-1": ["ViralLoad", "VLDBS", "VLPLASMA", ],
+    "HIV-1": ["ViralLoad", "VLDBS", "VLPLASMA", ],
+}

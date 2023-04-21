@@ -15,7 +15,8 @@ from config import (
     VERIFY_RESULT,
     SLEEP_SECONDS,
     SLEEP_SUBMISSION_COUNT,
-    EXCLUDE_RESULTS
+    EXCLUDE_RESULTS,
+    KEYWORDS_MAPPING
 )
 from db import engine, test_db_connection
 from result_parser import ResultParser
@@ -147,6 +148,29 @@ class SenaiteHandler:
             self.error_handler("create", url, response)
             return False, None
 
+    def resolve_by_keywords(self, keyword, results):
+        if len(results) == 0:
+            return False, None
+
+        mappings = KEYWORDS_MAPPING.get(keyword, [keyword])
+        mappings.append(keyword)
+        mappings = list(set(mappings))
+
+        states = ["unassigned", "assigned"]
+        results = list(filter(
+            lambda r: r["review_state"] in states and r["getKeyword"] in mappings, results))
+
+        if len(results) == 1:
+            return True, results[0]
+        if len(results) > 1:
+            logger.log(
+                "info", f"SenaiteHandler: More than 1 anlysis found for keyword: {keyword}")
+            return False, None
+
+        logger.log(
+            "info", f"SenaiteHandler: No anlysis found for keyword: {keyword}")
+        return False, None
+
     def do_work_for_order(self, order_id, request_id, result, keyword=None):
         self._auth_session()
 
@@ -159,9 +183,11 @@ class SenaiteHandler:
             return False
 
         search_items = search_payload.get("items", [])
-        if len(search_items) == 0:
+
+        found, search_data = self.resolve_by_keywords(keyword, search_items)
+        if not found:
             logger.log(
-                "info", f"SenaiteHandler:  search for {request_id} returned no matches.")
+                "info", f"SenaiteHandler: search for {request_id}, {keyword} did not find any matches")
             Hl7OrderHandler().update_hl7_result(order_id, 5)
             return False
 
@@ -172,14 +198,14 @@ class SenaiteHandler:
             "InterimFields": []
         }
 
-        search_data = search_items[0]
-        assert search_data.get("getParentTitle") == request_id
-
-        logger.log("info", f"SenaiteHandler:  ---submission---")
+        logger.log("info", f"SenaiteHandler:  ---submitting---")
         submitted, submission = self.update_resource(
-            search_data.get("uid"), submit_payload)
-        # Result is not None
-        # 'SubmittedBy': 'system_daemon', ResultCaptureDate is not None, DateSubmitted == ResultCaptureDate
+            search_data.get("uid"), submit_payload
+        )
+
+        if not submitted:
+            logger.log(
+                "info", f"Submission Responce for checking :  {submission}")
 
         if self.also_verify:
             if not submitted:
