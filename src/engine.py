@@ -96,7 +96,7 @@ class SenaiteHandler:
             response = self.session.post(url)
             if response.status_code == 200:
                 logger.log(
-                    "info", f"SenaiteConn: connection established: {self.base_url}")
+                    "info", f"SenaiteConn: connection established")
                 return True
             else:
                 logger.log("error", f"SenaiteConn: connection failed")
