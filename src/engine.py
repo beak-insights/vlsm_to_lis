@@ -91,6 +91,7 @@ class SenaiteHandler:
     def test_senaite_connection(self) -> bool:
         self._auth_session()
         url = f"{self.base_url}"
+        logger.log("info", f"SenaiteConn: intiating connection to: {url}")
         try:
             response = self.session.post(url)
             if response.status_code == 200:
@@ -120,7 +121,7 @@ class SenaiteHandler:
         return json.loads(response)
 
     def search_analyses_by_request_id(self, request_id):
-        """Searches senaite's Analysis portal for results 
+        """Searches senaite's Analysis portal for results
         @param request_id: Sample ID e.g BP-XXXXX
         @return dict
         """
@@ -152,6 +153,9 @@ class SenaiteHandler:
         if len(results) == 0:
             return False, None
 
+        logger.log(
+            "info", f"SenaiteHandler: Resolving analysis containing keyword {keyword} ...")
+
         mappings = KEYWORDS_MAPPING.get(keyword, [keyword])
         mappings.append(keyword)
         mappings = list(set(mappings))
@@ -161,7 +165,10 @@ class SenaiteHandler:
             lambda r: r["review_state"] in states and r["getKeyword"] in mappings, results))
 
         if len(results) == 1:
+            logger.log(
+                "info", f"SenaiteHandler: Analysis with keyword {keyword} successfully resolved ...")
             return True, results[0]
+
         if len(results) > 1:
             logger.log(
                 "info", f"SenaiteHandler: More than 1 anlysis found for keyword: {keyword}")
@@ -177,7 +184,6 @@ class SenaiteHandler:
         searched, search_payload = self.search_analyses_by_request_id(
             request_id
         )
-        # 'getResult': '', 'getResultCaptureDate': None, 'getSubmittedBy': None, 'getKeyword': 'XXXXXXX'
 
         if not searched:
             return False
@@ -198,7 +204,7 @@ class SenaiteHandler:
             "InterimFields": []
         }
 
-        logger.log("info", f"SenaiteHandler:  ---submitting---")
+        logger.log("info", f"SenaiteHandler:  ---submitting result---")
         submitted, submission = self.update_resource(
             search_data.get("uid"), submit_payload
         )
@@ -221,7 +227,7 @@ class SenaiteHandler:
             submission_data = submission_items[0]
             assert submission_data.get("uid") == search_data.get("uid")
 
-            logger.log("info", f"SenaiteHandler:  ---verification---")
+            logger.log("info", f"SenaiteHandler:  ---verifying result---")
             verified, verification = self.update_resource(
                 submission_data.get("uid"), verify_payload
             )
@@ -232,9 +238,19 @@ class SenaiteHandler:
 
 class ResultInterface(Hl7OrderHandler, SenaiteHandler):
     def run(self):
-        database_reachable = test_db_connection()
-        if not self.test_senaite_connection() or not database_reachable:
+
+        if not test_db_connection():
+            logger.log(
+                "info", f"Failed to connect to db, backing off a little ...")
             return
+
+        if not self.test_senaite_connection():
+            logger.log(
+                "info", f"Failed to connectto Senaite, backing off a little ...")
+            return
+
+        logger.log("info", f"All connections were successfully estabished :)")
+
         to_exclude = [x.strip().lower() for x in EXCLUDE_RESULTS]
         orders = self.fetch_hl7_results()
         for index, order in orders.iterrows():
