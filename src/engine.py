@@ -253,12 +253,24 @@ class ResultInterface(Hl7OrderHandler, SenaiteHandler):
 
         to_exclude = [x.strip().lower() for x in EXCLUDE_RESULTS]
         orders = self.fetch_hl7_results()
+
+        total = len(orders)
+
+        if not total > 0:
+            logger.log("info", f"ResultInterface: No orders at the moment :)")
+
+        logger.log(
+            "info", f"ResultInterface: {total} order are pending syncing ...")
+
         for index, order in orders.iterrows():
 
             if index > 0 and index % SLEEP_SUBMISSION_COUNT == 0:
                 logger.log("info", f"ResultInterface:  ---sleeping---")
                 time.sleep(SLEEP_SECONDS)
                 logger.log("info", f"ResultInterface:  ---waking---")
+
+            logger.log(
+                "info", f"ResultInterface: Processing {index} of {total} ...")
 
             # Parse the result object before sending to LIMS
             result_parser = ResultParser(order["results"], order["test_unit"])
