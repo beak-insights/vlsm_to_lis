@@ -36,10 +36,20 @@ class Hl7OrderHandler:
                 incoming[index] = item.replace(';', ' ').strip()
         return incoming
 
+    def patch_vlsm_error(self):
+        logger.log("info", f"Hl7OrderHandler: Patching vlsm result-issues where length(raw_text) >= 1200")
+        update_stmt = text(
+            """update orders set lims_sync_status=5 where lims_sync_status=0 and length(raw_text) >= 1200"""
+        )
+
+        with Session(engine) as session:
+            session.execute(update_stmt)
+            session.commit()
+
     def fetch_hl7_results(self):
         logger.log("info", f"Hl7OrderHandler: Fetching hl7 result orders ...")
         select_stmt = text(
-            """select * from orders where lims_sync_status=0 and length(raw_text) < 1200""")
+            """select * from orders where lims_sync_status=0""")
 
         with Session(engine) as session:
             result = session.execute(select_stmt)
@@ -243,13 +253,14 @@ class ResultInterface(Hl7OrderHandler, SenaiteHandler):
             logger.log(
                 "info", f"Failed to connect to db, backing off a little ...")
             return
+        self.patch_vlsm_error()
 
         if not self.test_senaite_connection():
             logger.log(
-                "info", f"Failed to connectto Senaite, backing off a little ...")
+                "info", f"Failed to connect to Senaite, backing off a little ...")
             return
 
-        logger.log("info", f"All connections were successfully estabished :)")
+        logger.log("info", f"All connections were successfully established :)")
 
         to_exclude = [x.strip().lower() for x in EXCLUDE_RESULTS]
         orders = self.fetch_hl7_results()
