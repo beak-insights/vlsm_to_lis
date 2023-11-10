@@ -253,7 +253,11 @@ class ResultInterface(Hl7OrderHandler, SenaiteHandler):
             logger.log(
                 "info", f"Failed to connect to db, backing off a little ...")
             return
+<<<<<<< HEAD
         # self.patch_vlsm_error()
+=======
+        self.patch_vlsm_error()
+>>>>>>> 0334210e68d3c45f19300c305a964c136ecf85d5
 
         if not self.test_senaite_connection():
             logger.log(
