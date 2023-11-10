@@ -19,7 +19,7 @@ POLL_HL7BD_EVERY = 10
 
 LINUX_USING_CRON_TIME_SCHEDULER = False
 
-EXCLUDE_RESULTS = ["Invalid", "ValueNotSet"]
+EXCLUDE_RESULTS = ["ValueNotSet"]
 
 # Keyword mappings
 KEYWORDS_MAPPING = {
