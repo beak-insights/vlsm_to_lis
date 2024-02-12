@@ -16,7 +16,8 @@ from config import (
     SLEEP_SECONDS,
     SLEEP_SUBMISSION_COUNT,
     EXCLUDE_RESULTS,
-    KEYWORDS_MAPPING
+    KEYWORDS_MAPPING,
+    DEBUG_LOGGING
 )
 from db import engine, test_db_connection
 from result_parser import ResultParser
@@ -160,6 +161,7 @@ class SenaiteHandler:
             return False, None
 
     def resolve_by_keywords(self, keyword, results):
+        orig = results
         if len(results) == 0:
             return False, None
 
@@ -185,7 +187,14 @@ class SenaiteHandler:
             return False, None
 
         logger.log(
-            "info", f"SenaiteHandler: No anlysis found for keyword: {keyword}")
+            "info", f"SenaiteHandler: No anlysis found for keyword: {keyword} <> mappings: {mappings}")
+        
+        if DEBUG_LOGGING:
+            for r in results:
+                logger.log("info", f"filtered: getKeyword: {r["getKeyword"]} <> status: {r["review_state"]}")
+            for r in orig:
+                logger.log("info", f"orig: getKeyword: {r["getKeyword"]} <> status: {r["review_state"]}")
+                
         return False, None
 
     def do_work_for_order(self, order_id, request_id, result, keyword=None):
@@ -267,7 +276,7 @@ class ResultInterface(Hl7OrderHandler, SenaiteHandler):
 
         total = len(orders)
 
-        if not total > 0:
+        if total <= 0:
             logger.log("info", f"ResultInterface: No orders at the moment :)")
 
         logger.log(

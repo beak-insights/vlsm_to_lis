@@ -39,3 +39,5 @@ KEYWORDS_MAPPING = {
     "qHIV-1": ["ViralLoad", "VLDBS", "VLPLASMA", ],
     "HIV-1": ["ViralLoad", "VLDBS", "VLPLASMA", ],
 }
+
+DEBUG_LOGGING = False
