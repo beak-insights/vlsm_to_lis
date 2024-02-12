@@ -191,9 +191,9 @@ class SenaiteHandler:
         
         if DEBUG_LOGGING:
             for r in results:
-                logger.log("info", f"filtered: getKeyword: {r["getKeyword"]} <> status: {r["review_state"]}")
+                logger.log("info", f"filtered: getKeyword: {r['getKeyword']} <> status: {r['review_state']}")
             for r in orig:
-                logger.log("info", f"orig: getKeyword: {r["getKeyword"]} <> status: {r["review_state"]}")
+                logger.log("info", f"orig: getKeyword: {r['getKeyword']} <> status: {r['review_state']}")
                 
         return False, None
 
