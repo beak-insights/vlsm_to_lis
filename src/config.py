@@ -35,9 +35,10 @@ KEYWORDS_MAPPING = {
     "HI2CAP96": ["HI2CAP96", "VLDBS", "VLPLASMA", ],
     # Roche 6800/8800
     "HIVVL": ["VLPLASMA", "EID"],
-    # Hologic Panther
+    # Hologic Panther/Alinity
     "qHIV-1": ["ViralLoad", "VLDBS", "VLPLASMA", ],
     "HIV-1": ["ViralLoad", "VLDBS", "VLPLASMA", ],
+    "HIV-DBS": ["ViralLoad", "VLDBS", "VLPLASMA", ],
 }
 
 DEBUG_LOGGING = False
