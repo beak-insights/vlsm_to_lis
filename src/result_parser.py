@@ -4,7 +4,9 @@ INTEPRETATIONS = {
     "< Titer min": "< 20",
     "< Titer Min": "< 20",
     "> Titer max": "> 10000000",
-    "> Titer Max": "> 10000000"
+    "> Titer Max": "> 10000000",
+    "Reactive": "Strong Positive",
+    "Non-Reactive": "Negative"
 }
 
 
